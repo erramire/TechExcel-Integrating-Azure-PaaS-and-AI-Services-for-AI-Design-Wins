@@ -27,6 +27,13 @@ var builder = WebApplication.CreateBuilder(args);
          endpoint: builder.Configuration["AzureOpenAI:Endpoint"]!,
          apiKey: builder.Configuration["AzureOpenAI:ApiKey"]!
      );
+    #pragma warning disable SKEXP0010 // Suppress the specific warning
+    kernelBuilder.AddAzureOpenAITextEmbeddingGeneration(
+        deploymentName: builder.Configuration["AzureOpenAI:EmbeddingDeploymentName"]!,
+        endpoint: builder.Configuration["AzureOpenAI:Endpoint"]!,
+        apiKey: builder.Configuration["AzureOpenAI:ApiKey"]!
+    );
+    #pragma warning restore SKEXP0010 // Restore the warning
      kernelBuilder.Plugins.AddFromType<DatabaseService>();
      return kernelBuilder.Build();
  });
@@ -51,15 +58,18 @@ builder.Services.AddSingleton<CosmosClient>((_) =>
     return client;
 });
 
-// Create a single instance of the AzureOpenAIClient to be shared across the application.
-builder.Services.AddSingleton<AzureOpenAIClient>((_) =>
-{
-    var endpoint = new Uri(builder.Configuration["AzureOpenAI:Endpoint"]!);
-    var credentials = new AzureKeyCredential(builder.Configuration["AzureOpenAI:ApiKey"]!);
 
-    var client = new AzureOpenAIClient(endpoint, credentials);
-    return client;
-});
+
+
+// Create a single instance of the AzureOpenAIClient to be shared across the application.
+// builder.Services.AddSingleton<AzureOpenAIClient>((_) =>
+// {
+//     var endpoint = new Uri(builder.Configuration["AzureOpenAI:Endpoint"]!);
+//     var credentials = new AzureKeyCredential(builder.Configuration["AzureOpenAI:ApiKey"]!);
+
+//     var client = new AzureOpenAIClient(endpoint, credentials);
+//     return client;
+// });
 
 var app = builder.Build();
 
